@@ -54,4 +54,21 @@ done: #string bittiyse
     mul $t1, $t5, 4 #aþaðýdaki satýr için
     sw $t3, numlist($t1) #put t3 to memory (t3 is the value of the number that has just been read)
     addi $t5, $t5, 1 #increase number of read numbers aka N^2
+    j sqroot
+    
+    
+sqroot: #square root operation to get dimension N
+    addi $t1, $zero, 1 #t1=1,2,3,4.... diye gidecek
+    addi $t2, $zero, 3 #t2=1,3,5... diye gidecek
+    addi $t3, $zero, 1 #t3 toplam olacak, t3=1,4,9,16... diye gidecek
+
+sqloop:
+    beq $t5, $t3, dimacqd
+    add $t3, $t3, $t2
+    addi $t2, $t2, 2
+    addi $t1, $t1, 1
+    j sqloop
+    
+dimacqd:
+    move $t5, $t1
     
