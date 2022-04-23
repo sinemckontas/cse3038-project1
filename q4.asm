@@ -4,7 +4,9 @@
     spacechar : .word ' ' #spacechar is a space character
     zerochar: .word '0'
     ninechar: .word '9'
+    newlinechar: .word '\n'
     numlist: .space 1000 #array of numbers
+    results: .space 1000 #array for results
     
     
  .text   
@@ -38,8 +40,6 @@ loop:
     addi $t2, $t1, -48 #convert char to int and keep it in t2
     mul $t3, $t3, 10 #t3=t3*10
     add $t3, $t3, $t2 #t3=(t3*10)+t2
-    
-
     j loop
      
    
@@ -61,8 +61,7 @@ sqroot: #square root operation to get dimension N
     addi $t1, $zero, 1 #t1=1,2,3,4.... diye gidecek
     addi $t2, $zero, 3 #t2=1,3,5... diye gidecek
     addi $t3, $zero, 1 #t3 toplam olacak, t3=1,4,9,16... diye gidecek
-
-sqloop:
+sqloop: 
     beq $t5, $t3, dimacqd
     add $t3, $t3, $t2
     addi $t2, $t2, 2
@@ -70,5 +69,74 @@ sqloop:
     j sqloop
     
 dimacqd:
-    move $t5, $t1
+    move $t5, $t1 # N (dimension) t5'te tutuluyor
     
+    
+    addi $t0, $zero, 1 #iþlemlerin N kez yapýlmasý kontrolü counter, 80. satýrdaki lw 1 iþlem yapýlmýþ gibi davranýyor
+    addi $t7, $zero, 0 #index
+    addi $t6, $zero, 0 #satýr counter
+    mul $t1, $t5, 4
+    addi $t1, $t1, 4 #indexe eklemek için 4(n+1) hesaplanýyor, t1'de tutuluyor
+    mul $t2, $t5, 4
+    addi $t2, $t2, -4 #indexten çýkarmak için 4(n-1) hesaplanýyor, t2'de tutuluyor
+    lw $t3, numlist($t7) # matrixin baþlangýcý
+    
+horizontaladd: #yatayda yapýlan iþlemler 
+    add $t7, $t7, $t1 #index (n+1) ileriye
+    lw $t4, numlist($t7) 
+    mul $t3, $t3, $t4
+    addi $t0, $t0, 1
+    beq $t0, $t5, horizontaldone
+horizontalsub:    
+    sub $t7, $t7, $t2
+    lw $t4, numlist($t7)
+    mul $t3, $t3, $t4
+    addi $t0, $t0, 1
+    beq $t0, $t5, horizontaldone
+    j horizontaladd
+    
+horizontaldone:
+    addi $v0, $zero, 1
+    move $a0, $t3
+    syscall
+    addi $v0, $zero, 11
+    lw $a0, spacechar
+    syscall
+    addi $t6, $t6, 1
+    div $t0, $t5, 2
+    beq $t6, $t0, vertical
+    addi $t0, $zero, 1 #iþlemlerin N kez yapýlmasý kontrolü counter, 80. satýrdaki lw 1 iþlem yapýlmýþ gibi davranýyor
+    addi $t7, $zero, 1
+    mul $t7,$t7, 8
+    mul $t7,$t7, $t6
+    mul $t7,$t7, $t5
+    lw $t3, numlist($t7)
+    j horizontaladd
+    
+vertical:
+    addi $t0, $zero, 1 #iþlemlerin N kez yapýlmasý kontrolü counter, 80. satýrdaki lw 1 iþlem yapýlmýþ gibi davranýyor
+    addi $t7, $zero, 4 #index dikeyde 1'den baþlýyor
+    lw $t3, numlist($t7) # matrixin baþlangýcý
+    
+verticalleft: #dikeyde yapýlan iþlemler
+    add $t7, $t7, $t2 #index (n+1) ileriye
+    lw $t4, numlist($t7) 
+    mul $t3, $t3, $t4
+    addi $t0, $t0, 1
+    beq $t0, $t5, verticaldone 
+verticalright:
+    add $t7, $t7, $t1
+    lw $t4, numlist($t7)
+    mul $t3, $t3, $t4
+    addi $t0, $t0, 1
+    beq $t0, $t5, verticaldone
+    j verticalleft
+    
+
+verticaldone:
+    addi $v0, $zero, 11
+    lw $a0, newlinechar
+    syscall
+    addi $v0, $zero, 1
+    move $a0, $t3
+    syscall
