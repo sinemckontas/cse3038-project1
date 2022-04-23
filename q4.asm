@@ -114,6 +114,7 @@ horizontaldone:
     j horizontaladd
     
 vertical:
+    addi $t6, $zero, 0 #sütun sayacý
     addi $t0, $zero, 1 #iþlemlerin N kez yapýlmasý kontrolü counter, 80. satýrdaki lw 1 iþlem yapýlmýþ gibi davranýyor
     addi $t7, $zero, 4 #index dikeyde 1'den baþlýyor
     lw $t3, numlist($t7) # matrixin baþlangýcý
@@ -140,3 +141,18 @@ verticaldone:
     addi $v0, $zero, 1
     move $a0, $t3
     syscall
+    addi $v0, $zero, 11
+    lw $a0, spacechar
+    syscall
+    addi $t6, $t6, 1
+    div $t0, $t5, 2
+    beq $t6, $t0, exit
+    addi $t0, $zero, 1 #iþlemlerin N kez yapýlmasý kontrolü counter, 80. satýrdaki lw 1 iþlem yapýlmýþ gibi davranýyor
+    mul $t7, $t6, 2
+    addi $t7, $t7, 1
+    mul $t7, $t7, 4
+    lw $t3, numlist($t7)
+    j horizontaladd
+    
+    
+exit:
