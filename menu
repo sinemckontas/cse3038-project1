@@ -4,8 +4,27 @@ strOption:   .asciiz  "Please select an option:\n"
 strEnd:	     .asciiz  "5 and exitting...\n"
 strFonksiyon: .asciiz "Fonksiyon\n"
 
+q1inputText: 	.asciiz "Input: "
+q1typeText: 	.asciiz "Type: "
+q1outputText:	.asciiz "Output: "	
 
-	.text 
+q1list:           .space 1000
+q1resultString:	.space 1000
+
+
+
+q2str: .asciiz "11111101"
+q2strFirstNom: .asciiz "Enter the first nominator:\n"
+q2strSecondNom: .asciiz "Enter the second nominator:\n"
+
+q2strFirstDenom: .asciiz "Enter the first denominator:\n"
+q2strSecondDenom: .asciiz "Enter the second denominator:\n"
+
+q2strSlash: .asciiz "/"
+
+
+
+.text 
 	
 main:
 
@@ -26,17 +45,227 @@ while:	beq $t0, 5, endwhile 	#while option is not 5(exit)
 	move $t0, $v0
 	
 	
-	beq $t0, 1, question1  #if user choice option 1
-	
-	beq $t0, 2, question2  #if user choice option 2
-	
-    beq $t0, 3, question3  #if user choice option 3
-	
-    beq $t0, 4, question4  #if user choice option 4
 	
 	
-	j while
 	
+	
+	
+	beq $t0, 1, q1function1  #if user choice option 1
+	
+	beq $t0, 2, q2question2  #if user choice option 2
+	
+#    	beq $t0, 3, question3  #if user choice option 3
+	
+# 	beq $t0, 4, question4  #if user choice option 4
+	
+	beq $t0, 5, endwhile
+	
+	
+	
+q1function1:
+	li $v0, 4             #input texti y�kl�yoruz
+	la $a0, q1inputText     #inputu bas�yoruz
+	syscall
+	
+	li $v0, 8 
+	la $a0, q1list    # load byte space into address
+	li $a1, 1000     # allot the byte space for string
+	syscall
+	
+	li $v0, 4
+	la $a0, q1typeText
+	syscall
+	
+	li $v0, 5
+	syscall		# The type number is stored in v0
+	
+	move $s0, $v0	# Save the type value in s0
+	j q1length
+	
+q1length_ret:
+	move $s1, $v0	# Save the length of binary string in s1
+	# beq $s0, 1, base_ten
+	# beq $s0, 2, base_sixteen
+
+q1convert_ret:
+   	la $a0, q1outputText	# load and print "output" string
+    	li $v0, 4
+    	syscall
+    		
+   	la $a0, q1resultString	# reload byte space to primary addressmove $a0, $s0   # primary address = t0 address (load pointer)
+    	li $v0, 4		# print string
+    	syscall
+    	j q1exit
+
+q1length:
+	addi $t0, $zero, 0 # Array index
+	addi $t1, $zero, 0 # Character read from array
+	addi $t2, $zero, 0 # Number of valid characters
+q1length_loop:
+	lbu $t1, q1list($t0)			# Load the character from user input
+	beq $t1, 48, q1length_loop_count_char	# branch if char == '0'
+	beq $t1, 49, q1length_loop_count_char	# branch if char == '1'
+	beq $t1, 32, q1length_loop_skip_char	# skip current char if space character
+	j q1length_loop_return			# Character is neither '0', '1', nor a space. Invalid char, EOL reached.
+q1length_loop_count_char:
+	addi $t2, $t2, 1 # Increment valid char counter
+q1length_loop_skip_char:
+	addi $t0, $t0, 1 # Move to next char
+	j q1length_loop
+q1length_loop_return:
+	move $v0, $t2	# Return the length of binary number
+	j q1length_ret
+
+q1exit:
+	  j while
+	
+
+q2question2:
+	
+
+	
+	li $v0, 4
+	la $a0, q2strFirstNom		#ask first nominator		
+	syscall
+	
+	li $v0, 5
+	syscall 
+	move $t1, $v0			#first nom --> t1
+	
+	#-----------------------
+	li $v0, 4
+	la $a0, q2strFirstDenom		#ask first denominator
+	syscall
+	
+	li $v0, 5
+	syscall 
+	move $t2, $v0			#first denom --> t2
+	#-----------------------
+	li $v0, 4
+	la $a0, q2strSecondNom		#ask second nominator	
+	syscall
+
+	li $v0, 5
+	syscall 
+	move $t3, $v0			#second nom --> t3
+	#-----------------------
+	li $v0, 4
+	la $a0, q2strSecondDenom		#ask second denominator
+	syscall	
+
+	li $v0, 5
+	syscall 
+	move $t4, $v0			#second denom --> t4
+	#-----------------------
+	
+	
+	mul $t5 ,$t1, $t4		#first nom * second denom -> t5
+	mul $t6, $t3, $t2		#second nom * first denom -> t6
+	
+	add $t7, $t5, $t6		#t7 = (firstNom*secondDenom+ secondNom*firstDenom)
+	
+	add $s7, $t7, $zero		#save final nom
+	
+	mul $t6, $t2, $t4		#t6 = firstDenom*secondDenom
+	add $s6, $t6, $zero		#save final denom
+
+	
+	#add $a1, $t5, $zero	# a1 = t5
+	#add $a2, $t5, $zero	# a2 = t6
+	
+	jal q2gcd				#jump to the gcd func
+	
+	
+
+	
+	
+	div $s7, $s7, $v1		#divide nom to gcd
+	div $s6, $s6, $v1		#divide denom to gcd
+	
+	li $v0 ,1			#printi int
+	add $a0 ,$s7, $zero
+	syscall				#print gcd
+	
+	li $v0, 4
+	la $a0, q2strSlash		#ask first denominator
+	syscall
+	
+	li $v0 ,1			#printi int
+	add $a0 ,$s6, $zero
+	syscall				#print gcd	
+	
+	
+	j q2exitq2
+	
+	
+q2gcd:
+	addi, $sp, $sp, -12
+	
+	sw $ra, 0($sp)			#push func into the stack
+	sw $s0, 4($sp)			#push s0 into stack
+	sw $s1, 8($sp)			#push s1 into stack
+	
+	
+	
+
+	
+	
+	add $s0, $t6, $zero		#s0 = first param
+	add $s1, $t7, $zero		#s1 = second param
+	
+	#add $t1, $zero, $zero		#t1 = 0
+	
+	beq $zero, $s1, q2returnGcd	#if second param is equal to zero return the output
+	
+	addi $t6, $s1, 0		#t6 = second param
+	
+	
+	
+
+	
+	
+	div $s0, $s1
+	mfhi $t2
+	
+	
+#	li $v0 ,1			#printi int
+#	add $a0 ,$t2, $zero
+#	syscall				#print gcd
+	
+#	j exitq2
+	
+	
+	
+	
+	addi $t7, $t2, 0		
+	
+	jal q2gcd
+	
+	
+
+	
+	
+
+	
+	
+q2returnGcd:
+	move  $v1, $t6	#returns first param (gcd)
+	jal q2exitGcd
+q2exitGcd:
+	lw $ra, 0($sp)
+	lw $s0, 4($sp)
+	lw $s1, 8($sp)
+		
+	addi $sp, $sp, 12
+		
+	jr $ra
+	
+q2exitq2:
+	j while	
+	
+	
+	
+
 
 endwhile: 
 	
