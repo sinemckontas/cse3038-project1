@@ -1,53 +1,52 @@
 .data
-strWelcome:  .asciiz  "Main Menu:\n 1. Base Converter\n 2. Add Rational Number\n 3. Text Parser\n 4. Mystery Matrix Operation \n 5. Exit\n "
-strOption:   .asciiz  "Please select an option:\n"
-strEnd:	     .asciiz  "5 and exitting...\n"
-strFonksiyon: .asciiz "Fonksiyon\n"
 
-q1inputText: 	.asciiz "Input: "
-q1typeText: 	.asciiz "Type: "
-q1outputText:	.asciiz "Output: "	
-q1list:           .space 1000
-q1resultString:	.space 1000
+strWelcome:      .asciiz  "\nMain Menu:\n 1. Base Converter\n 2. Add Rational Number\n 3. Text Parser\n 4. Mystery Matrix Operation \n 5. Exit\n "
+strOption:       .asciiz  "Please select an option: "
+strEnd:	         .asciiz  "5 and exitting...\n"
+strFonksiyon:    .asciiz "Fonksiyon\n"
 
 
-
-q2str: .asciiz "11111101"
-q2strFirstNom: .asciiz "Enter the first nominator:\n"
-q2strSecondNom: .asciiz "Enter the second nominator:\n"
-q2strFirstDenom: .asciiz "Enter the first denominator:\n"
-q2strSecondDenom: .asciiz "Enter the second denominator:\n"
-q2strSlash: .asciiz "/"
+q1inputText: 	 .asciiz "Input: "
+q1typeText: 	 .asciiz "Type: "
+q1outputText:	 .asciiz "Output: "	
+q1list:          .space 1000
+q1resultString:	 .space 1000
 
 
-
-q3prompt1:    .asciiz      "Enter string: "
-q3str: .space 1000 #array for the string read from user
-q3prompt2:    .asciiz      "Enter parser set: "
-q3parsers: .space 100 #array for the parser set read from user
-q3nullchar: .word 0 #null character
-q3newlinechar: .word '\n'
-q3spacechar : .word ' ' #spacechar is a space character
-q3wordlist: .space 1000 #array of words
+q2str: 		  .asciiz "11111101"
+q2strFirstNom:    .asciiz "Enter the first nominator: "
+q2strSecondNom:   .asciiz "Enter the second nominator: "
+q2strFirstDenom:  .asciiz "Enter the first denominator: "
+q2strSecondDenom: .asciiz "Enter the second denominator: "
+q2strSlash: 	  .asciiz "/"
 
 
+q3prompt1:        .asciiz      "Enter string: "
+q3str: 		  .space 1000 #array for the string read from user
+q3prompt2:        .asciiz      "Enter parser set: "
+q3parsers: 	  .space 100 #array for the parser set read from user
+q3nullchar: 	  .word 0 #null character
+q3newlinechar:    .word '\n'
+q3spacechar:     .word ' ' #spacechar is a space character
+q3wordlist:       .space 1000 #array of words
 
-q4prompt1:    .asciiz      "Enter numbers: "
-q4list: .space 1000 #array for the string read from user
-q4spacechar : .word ' ' #spacechar is a space character
-q4zerochar: .word '0'
-q4ninechar: .word '9'
-q4newlinechar: .word '\n'
-q4numlist: .space 1000 #array of numbers
-q4results: .space 1000 #array for results
+
+q4prompt1:        .asciiz      "Enter numbers: "
+q4list: 	  .space 1000 #array for the string read from user
+q4spacechar:     .word ' ' #spacechar is a space character
+q4zerochar: 	  .word '0'
+q4ninechar: 	  .word '9'
+q4newlinechar:    .word '\n'
+q4numlist: 	  .space 1000 #array of numbers
+q4results: 	  .space 1000 #array for results
 
 .text 
 	
 main:
-
 	add $t0, $zero , $zero
 	
-while:	beq $t0, 5, endwhile 	#while option is not 5(exit)
+while:	
+	beq $t0, 5, endwhile 	#while option is not 5(exit)
 
 	li $v0, 4		#welcome message
 	la $a0, strWelcome
@@ -60,10 +59,8 @@ while:	beq $t0, 5, endwhile 	#while option is not 5(exit)
 	li $v0, 5		#storing option to temp
 	syscall
 	move $t0, $v0
-	
-	
-	
-	
+
+#---------------------------------------------------------	
 	beq $t0, 1, q1question1  #if user choice option 1
 	
 	beq $t0, 2, q2question2  #if user choice option 2
@@ -74,7 +71,7 @@ while:	beq $t0, 5, endwhile 	#while option is not 5(exit)
 	
 	beq $t0, 5, endwhile
 	
-	
+#------------------------------------------------------------------------------------
 	
 q1question1:
 	li $v0, 4             #input texti y�kl�yoruz
@@ -115,29 +112,32 @@ q1length:
 	addi $t0, $zero, 0 # Array index
 	addi $t1, $zero, 0 # Character read from array
 	addi $t2, $zero, 0 # Number of valid characters
+	
 q1length_loop:
 	lbu $t1, q1list($t0)			# Load the character from user input
 	beq $t1, 48, q1length_loop_count_char	# branch if char == '0'
 	beq $t1, 49, q1length_loop_count_char	# branch if char == '1'
 	beq $t1, 32, q1length_loop_skip_char	# skip current char if space character
 	j q1length_loop_return			# Character is neither '0', '1', nor a space. Invalid char, EOL reached.
+	
 q1length_loop_count_char:
 	addi $t2, $t2, 1 # Increment valid char counter
+	
 q1length_loop_skip_char:
 	addi $t0, $t0, 1 # Move to next char
 	j q1length_loop
+	
 q1length_loop_return:
 	move $v0, $t2	# Return the length of binary number
 	j q1length_ret
 
 q1exit:
-	  j while
+	j while
 	
+	
+#-------------------------------------------------------------------------------
 
 q2question2:
-	
-
-	
 	li $v0, 4
 	la $a0, q2strFirstNom		#ask first nominator		
 	syscall
@@ -183,14 +183,11 @@ q2question2:
 	mul $t6, $t2, $t4		#t6 = firstDenom*secondDenom
 	add $s6, $t6, $zero		#save final denom
 
-	
+
 	#add $a1, $t5, $zero	# a1 = t5
 	#add $a2, $t5, $zero	# a2 = t6
 	
 	jal q2gcd				#jump to the gcd func
-	
-	
-
 	
 	
 	div $s7, $s7, $v1		#divide nom to gcd
@@ -208,9 +205,7 @@ q2question2:
 	add $a0 ,$s6, $zero
 	syscall				#print gcd	
 	
-	
 	j q2exitq2
-	
 	
 q2gcd:
 	addi, $sp, $sp, -12
@@ -218,10 +213,6 @@ q2gcd:
 	sw $ra, 0($sp)			#push func into the stack
 	sw $s0, 4($sp)			#push s0 into stack
 	sw $s1, 8($sp)			#push s1 into stack
-	
-	
-	
-
 	
 	
 	add $s0, $t6, $zero		#s0 = first param
@@ -232,10 +223,6 @@ q2gcd:
 	beq $zero, $s1, q2returnGcd	#if second param is equal to zero return the output
 	
 	addi $t6, $s1, 0		#t6 = second param
-	
-	
-	
-
 	
 	
 	div $s0, $s1
@@ -249,22 +236,15 @@ q2gcd:
 #	j exitq2
 	
 	
-	
-	
 	addi $t7, $t2, 0		
 	
 	jal q2gcd
 	
 	
-
-	
-	
-
-	
-	
 q2returnGcd:
 	move  $v1, $t6	#returns first param (gcd)
 	jal q2exitGcd
+	
 q2exitGcd:
 	lw $ra, 0($sp)
 	lw $s0, 4($sp)
@@ -278,98 +258,98 @@ q2exitq2:
 	j while	
 	
 
+#--------------------------------------------------------------------------------------------------
 	
-q3question3:    li $v0, 4     #command for printing a string
-   		la $a0, q3prompt1 #loading the string to print into the argument to enable printing
-    		syscall
+q3question3:    
+	li $v0, 4     #command for printing a string
+   	la $a0, q3prompt1 #loading the string to print into the argument to enable printing
+    	syscall
    	 
 
-    		li $v0, 8    #command for reading a string
-    		la $a0, q3str
-    		li $a1, 1000
-    		syscall      #executing the command 
+    	li $v0, 8    #command for reading a string
+    	la $a0, q3str
+    	li $a1, 1000
+    	syscall      #executing the command 
     
-    		move $t0, $a0 #a0'� bi yere kopyala	 
-    		add $t4, $zero, $zero #t4 initialized as zero, represents the word just read
-    		add $t5, $zero, $zero #t5 initialized as zero, represents length of string
+    	move $t0, $a0 #a0'� bi yere kopyala	 
+    	add $t4, $zero, $zero #t4 initialized as zero, represents the word just read
+    	add $t5, $zero, $zero #t5 initialized as zero, represents length of string
     
     
-    		li $v0, 4     #command for printing a string
-    		la $a0, q3prompt2 #loading the string to print into the argument to enable printing
-    		syscall
-    
+    	li $v0, 4     #command for printing a string
+    	la $a0, q3prompt2 #loading the string to print into the argument to enable printing
+    	syscall
 
-    		li $v0, 8    #command for reading a string
-    		la $a0, q3parsers
-    		li $a1, 1000
-    		syscall      #executing the command
+    	li $v0, 8    #command for reading a string
+    	la $a0, q3parsers
+    	li $a1, 1000
+    	syscall      #executing the command
     
-    		move $t1, $a0 #a0'� bi yere kopyala	  
-    		lw $t7, q3spacechar #space char put into t7
-    		add $s0, $zero, $zero
+    	move $t1, $a0 #a0'� bi yere kopyala	  
+    	lw $t7, q3spacechar #space char put into t7
+    	add $s0, $zero, $zero
     
     
 q3stringloop: 
-    lbu $t2, 0($t0) #karakter kareakter string okuma
-    addi $t0, $t0, 1 #to read next char
-    beq $t2, $t7, q3nextelement #go to nextelement if space char occurs
+	lbu $t2, 0($t0) #karakter kareakter string okuma
+	addi $t0, $t0, 1 #to read next char
+	beq $t2, $t7, q3nextelement #go to nextelement if space char occurs
     
-    lw $t6, q3nullchar
-    beq $t2, $t6, q3done #go to done if null char occurs
-    lw $t6, q3newlinechar
-    beq $t2, $t6, q3done #go to done if newline char occurs
+	lw $t6, q3nullchar
+	beq $t2, $t6, q3done #go to done if null char occurs
+	lw $t6, q3newlinechar
+	beq $t2, $t6, q3done #go to done if newline char occurs
     
 q3parserloop:
-    lbu $t3, 0($t1)   #karakter karakter parse set okuma
-    addi $t1, $t1, 1 #read next parse char
-    beq $t2, $t3, q3nextelement #go to nextelement if parser char occurs
-    beq $t3, $t7, q3parserloop # ignore space
-    lw $t6, q3nullchar
-    beq $t3, $t6, q3parserdone #go to done if null char occurs
-    lw $t6, q3newlinechar
-    beq $t3, $t6, q3parserdone #go to done if newline char occurs
-    j q3parserloop
+	lbu $t3, 0($t1)   #karakter karakter parse set okuma
+	addi $t1, $t1, 1 #read next parse char
+	beq $t2, $t3, q3nextelement #go to nextelement if parser char occurs
+	beq $t3, $t7, q3parserloop # ignore space
+	lw $t6, q3nullchar
+	beq $t3, $t6, q3parserdone #go to done if null char occurs
+	lw $t6, q3newlinechar
+	beq $t3, $t6, q3parserdone #go to done if newline char occurs
+	j q3parserloop
      
 #de�i�ecek
 q3nextelement: #bo�luk ya da parse char varsa
-    la $t1, q3parsers
-    beq $s0, 0, q3stringloop
-    lw $t6, q3newlinechar
-    li $v0, 11
-    move $a0, $t6
-    syscall
-    add $s0, $zero, $zero
-    j q3stringloop
+	la $t1, q3parsers
+	beq $s0, 0, q3stringloop
+	lw $t6, q3newlinechar
+	li $v0, 11
+	move $a0, $t6
+	syscall
+	add $s0, $zero, $zero
+	j q3stringloop
 
 q3parserdone: #print character
-    la $t1, q3parsers
-    li $v0, 11
-    move $a0, $t2
-    syscall
-    addi $s0, $s0, 1
-    j q3stringloop
+	la $t1, q3parsers
+	li $v0, 11
+	move $a0, $t2
+	syscall
+	addi $s0, $s0, 1
+	j q3stringloop
    
 q3done: #string bittiyse
-    lw $t6, q3newlinechar
-    li $v0, 11
-    move $a0, $t6
-    syscall			
+	lw $t6, q3newlinechar
+	li $v0, 11
+	move $a0, $t6
+	syscall			
 	
-j while
+	j while
 
-
-
+#-------------------------------------------------------------------------------------------------
 
 q4question4:
-    li $v0, 4     #command for printing a string
-    la $a0, q4prompt1 #loading the string to print into the argument to enable printing
-    syscall
+	li $v0, 4     #command for printing a string
+	la $a0, q4prompt1 #loading the string to print into the argument to enable printing
+	syscall
     
 
-    li $v0, 8    #command for reading a string
-    la $a0, q4list
-    li $a1, 1000
-    syscall      #executing the command 
+	li $v0, 8    #command for reading a string
+	la $a0, q4list
+	li $a1, 1000
+	syscall      #executing the command 
     
     move $t0, $a0 #a0'� bi yere kopyala	
     
@@ -509,7 +489,7 @@ q4verticaldone:
 q4exit:
 	j while
 	
-	
+#-----------------------------------------------------------------------------------------------------------------------------	
 endwhile: 
 	
 	li $v0, 4
