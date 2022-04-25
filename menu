@@ -106,7 +106,7 @@ q1convert_ret:
     	li $v0, 4
     	syscall
     		
-   	la $a0, q1resultString	# reload byte space to primary addressmove $a0, $s0   # primary address = t0 address (load pointer)
+   	la $a0, q1list	# reload byte space to primary addressmove $a0, $s0   # primary address = t0 address (load pointer)
     	li $v0, 4		# print string
     	syscall
     	j q1exit
